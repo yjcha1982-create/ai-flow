@@ -25,6 +25,20 @@ export default function JsonViewer({
     [activeFlowId, project, request],
   );
 
+  const loadJsonFile = (event) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result || '');
+      setResponseJson(text);
+      onImportProject(text);
+      input.value = '';
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <section className="ai-workspace">
       <div className="workspace-heading">
@@ -64,6 +78,10 @@ export default function JsonViewer({
           <button className="import-project-button" type="button" disabled={!responseJson.trim()} onClick={() => onImportProject(responseJson)}>
             AI Flow JSON 검증 후 적용
           </button>
+          <label className="file-import-button">
+            JSON 파일 열기
+            <input type="file" accept=".json,application/json" onChange={loadJsonFile} />
+          </label>
         </>
       )}
 

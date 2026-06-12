@@ -129,7 +129,7 @@ export default function App() {
         position: { x: 160 + (offset % 240), y: 130 + (offset % 180) },
         data: {
           title: '새 Box',
-          boxType: 'feature',
+          boxType: 'function',
           description: '',
           prompt: '',
           childFlowId: null,
@@ -205,6 +205,52 @@ export default function App() {
     },
     [activeFlow.nodes, activeFlowId, clearSelection, notify],
   );
+
+  const addFlowFromExplorer = useCallback(() => {
+    const boxId = uniqueId('box');
+    const flowId = uniqueId('flow');
+    const flowNumber = Object.keys(project.flows).length + 1;
+    const title = `새 Flow ${flowNumber}`;
+    const offset = activeFlow.nodes.length * 24;
+    const ownerBox = {
+      id: boxId,
+      type: 'boxNode',
+      position: { x: 160 + (offset % 240), y: 130 + (offset % 180) },
+      data: {
+        title,
+        boxType: 'flow',
+        description: '하위 Flow를 포함하는 Box입니다.',
+        prompt: '',
+        childFlowId: flowId,
+        status: 'draft',
+        acceptanceCriteria: '',
+        outputs: '',
+        executionNote: '',
+      },
+    };
+
+    setProject((current) => ({
+      ...current,
+      flows: {
+        ...current.flows,
+        [activeFlowId]: {
+          ...current.flows[activeFlowId],
+          nodes: [...current.flows[activeFlowId].nodes, ownerBox],
+        },
+        [flowId]: createEmptyFlow(flowId, title, boxId),
+      },
+      updatedAt: new Date().toISOString(),
+    }));
+    setActiveFlowId(flowId);
+    clearSelection();
+    notify(`${title}를 추가했습니다.`);
+  }, [
+    activeFlow.nodes.length,
+    activeFlowId,
+    clearSelection,
+    notify,
+    project.flows,
+  ]);
 
   const deleteSelected = useCallback(() => {
     if (selectedBox) {
@@ -329,6 +375,7 @@ export default function App() {
           project={project}
           activeFlowId={activeFlow.id}
           onOpenFlow={openFlow}
+          onAddFlow={addFlowFromExplorer}
           validation={validation}
         />
 

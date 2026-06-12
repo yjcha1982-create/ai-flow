@@ -21,7 +21,7 @@ function FlowBranch({ project, flowId, activeFlowId, onOpenFlow, depth = 0 }) {
       {flow.nodes.map((node) => {
         const childFlowId = node.data.childFlowId;
         if (!childFlowId) return null;
-        const type = BOX_TYPES[node.data.boxType] || BOX_TYPES.feature;
+        const type = BOX_TYPES[node.data.boxType] || BOX_TYPES.function;
         return (
           <div key={node.id}>
             <div className="explorer-owner" style={{ paddingLeft: 23 + depth * 13 }}>
@@ -42,7 +42,13 @@ function FlowBranch({ project, flowId, activeFlowId, onOpenFlow, depth = 0 }) {
   );
 }
 
-export default function FlowExplorer({ project, activeFlowId, onOpenFlow, validation }) {
+export default function FlowExplorer({
+  project,
+  activeFlowId,
+  onOpenFlow,
+  onAddFlow,
+  validation,
+}) {
   return (
     <aside className="flow-explorer">
       <div className="explorer-heading">
@@ -52,8 +58,13 @@ export default function FlowExplorer({ project, activeFlowId, onOpenFlow, valida
       </div>
 
       <div className="explorer-section-title">
-        <span>Flow 탐색기</span>
-        <small>{Object.keys(project.flows).length}</small>
+        <span>
+          Flow 탐색기
+          <small>{Object.keys(project.flows).length}</small>
+        </span>
+        <button type="button" onClick={onAddFlow} title="현재 Flow 아래에 하위 Flow 추가">
+          + Flow
+        </button>
       </div>
       <nav className="explorer-tree">
         <FlowBranch

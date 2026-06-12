@@ -32,4 +32,9 @@ npm run build
 - [사용 가이드](docs/USER_GUIDE.md)
 - [Flow JSON 규격](docs/FLOW_SPEC.md)
 
+## 검증용 샘플
+
+- [게시글·댓글 Flow JSON](samples/board-with-comments.flow.json)
+- [게시판 개발 요청 템플릿](samples/BOARD_DEVELOPMENT_REQUEST.md)
+
 브라우저 저장 키는 `ai-flow-project`입니다.

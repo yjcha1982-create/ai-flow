@@ -17,7 +17,7 @@ import {
 } from '../utils/projectModel';
 
 const BoxNode = memo(({ data, selected }) => {
-  const type = BOX_TYPES[data.boxType] || BOX_TYPES.feature;
+  const type = BOX_TYPES[data.boxType] || BOX_TYPES.function;
   const hasPrompt = Boolean(data.prompt?.trim());
   const hasFlow = Boolean(data.childFlowId);
 
@@ -72,8 +72,8 @@ function FlowInner({
         `relation-${Date.now()}`,
         connection.source,
         connection.target,
-        'sequence',
-        '새 관계',
+        'flow',
+        '다음으로',
       );
       updateEdges((edges) => addEdge({ ...connection, ...relation }, edges));
     },
@@ -107,7 +107,7 @@ function FlowInner({
         <MiniMap
           className="mini-map"
           nodeColor={(node) =>
-            BOX_TYPES[node.data?.boxType]?.color || BOX_TYPES.feature.color
+            BOX_TYPES[node.data?.boxType]?.color || BOX_TYPES.function.color
           }
         />
         <Controls />

@@ -1,0 +1,1514 @@
+{
+  "schemaVersion": "1.1",
+  "title": "게시글·댓글 프로젝트",
+  "rootFlowId": "flow-board-root",
+  "rules": {
+    "version": "1.1",
+    "requireBoxTitle": true,
+    "requireBoxPromptOrChildFlow": true,
+    "requireRelationLabel": true,
+    "preventSelfRelation": true,
+    "allowedBoxTypes": [
+      "function",
+      "relay",
+      "condition",
+      "loop",
+      "schedule",
+      "flow",
+      "start",
+      "end"
+    ],
+    "allowedRelationTypes": [
+      "flow",
+      "round_trip",
+      "send_end",
+      "repeat_request",
+      "signal",
+      "reference"
+    ],
+    "executionPolicy": [
+      "AI는 승인된 Box만 실행한다.",
+      "Box의 동작 규칙과 관계의 이동 방식을 그대로 따른다.",
+      "Flow를 임의로 변경하지 않고 변경안을 먼저 제안한다.",
+      "완료 시 입력, 출력, 실행 결과를 해당 Box에 기록한다.",
+      "실패하거나 모호하면 상태를 blocked로 바꾸고 이유를 기록한다."
+    ]
+  },
+  "flows": {
+    "flow-board-root": {
+      "id": "flow-board-root",
+      "title": "게시판 전체 Flow",
+      "parentBoxId": null,
+      "viewport": {
+        "x": 0,
+        "y": 0,
+        "zoom": 0.8
+      },
+      "nodes": [
+        {
+          "id": "box-board-start",
+          "type": "boxNode",
+          "position": { "x": 40, "y": 250 },
+          "data": {
+            "title": "게시판 시작",
+            "boxType": "start",
+            "description": "사용자의 게시판 요청이 들어오는 시작점입니다.",
+            "prompt": "사용자의 게시판 요청과 현재 사용자 정보를 받는다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "사용자 요청\n현재 사용자",
+            "outputs": "게시판 요청",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "요청 종류와 필요한 입력이 식별됨",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-identify-action",
+          "type": "boxNode",
+          "position": { "x": 300, "y": 250 },
+          "data": {
+            "title": "요청 종류 확인",
+            "boxType": "condition",
+            "description": "목록, 읽기, 작성, 수정, 댓글, 대댓글 요청을 구분합니다.",
+            "prompt": "요청 경로와 사용자 행동을 기준으로 실행할 내부 Flow를 선택한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "게시판 요청",
+            "outputs": "선택된 요청 종류",
+            "conditionRule": "list=목록, read=상세 읽기, create/update=작성·수정, comment/reply=댓글·대댓글",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "요청이 정확히 하나의 경로로 분류됨",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-post-list-flow",
+          "type": "boxNode",
+          "position": { "x": 610, "y": 20 },
+          "data": {
+            "title": "게시글 목록",
+            "boxType": "flow",
+            "description": "게시글을 페이지 단위로 조회하고 목록을 표시합니다.",
+            "prompt": "내부 Flow에 따라 게시글 목록과 페이지 정보를 만든다.",
+            "childFlowId": "flow-post-list",
+            "status": "approved",
+            "inputs": "페이지\n검색어",
+            "outputs": "게시글 목록\n페이지 정보",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "최신 글 우선 목록 표시\n빈 목록 처리\n페이지 이동 가능",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-post-read-flow",
+          "type": "boxNode",
+          "position": { "x": 610, "y": 170 },
+          "data": {
+            "title": "게시글 읽기",
+            "boxType": "flow",
+            "description": "게시글 한 건과 댓글·대댓글을 함께 읽습니다.",
+            "prompt": "내부 Flow에 따라 게시글 상세와 댓글 트리를 구성한다.",
+            "childFlowId": "flow-post-read",
+            "status": "approved",
+            "inputs": "게시글 ID",
+            "outputs": "게시글 상세\n댓글 트리",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "게시글 내용 표시\n댓글과 대댓글 계층 표시\n없는 글 처리",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-post-editor-flow",
+          "type": "boxNode",
+          "position": { "x": 610, "y": 320 },
+          "data": {
+            "title": "게시글 작성·수정",
+            "boxType": "flow",
+            "description": "새 게시글을 작성하거나 작성자가 기존 글을 수정합니다.",
+            "prompt": "작성과 수정을 구분하고 입력 검증과 권한 확인 후 저장한다.",
+            "childFlowId": "flow-post-editor",
+            "status": "approved",
+            "inputs": "작성 또는 수정 요청\n게시글 입력\n현재 사용자",
+            "outputs": "저장된 게시글",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "제목·내용 검증\n작성자만 수정\n저장 후 상세 화면 이동",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-comment-flow",
+          "type": "boxNode",
+          "position": { "x": 610, "y": 470 },
+          "data": {
+            "title": "댓글·대댓글",
+            "boxType": "flow",
+            "description": "게시글에 댓글을 쓰고 댓글 아래에 한 단계 대댓글을 작성합니다.",
+            "prompt": "일반 댓글과 대댓글을 구분하고 유효한 게시글과 부모 댓글에 저장한다.",
+            "childFlowId": "flow-comment-editor",
+            "status": "approved",
+            "inputs": "게시글 ID\n댓글 내용\n부모 댓글 ID 선택값\n현재 사용자",
+            "outputs": "저장된 댓글\n갱신된 댓글 트리",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "댓글 작성 가능\n대댓글은 한 단계만 허용\n빈 내용 거부\n저장 후 즉시 목록 반영",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-board-result",
+          "type": "boxNode",
+          "position": { "x": 930, "y": 250 },
+          "data": {
+            "title": "화면 결과 전달",
+            "boxType": "relay",
+            "description": "각 내부 Flow의 성공 또는 실패 결과를 사용자 화면에 전달합니다.",
+            "prompt": "결과 종류에 맞는 화면 상태와 안내 메시지를 전달한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "목록, 상세, 저장 결과 또는 오류",
+            "outputs": "화면 데이터\n사용자 안내",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "성공과 오류가 사용자에게 명확히 표시됨",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-board-end",
+          "type": "boxNode",
+          "position": { "x": 1200, "y": 250 },
+          "data": {
+            "title": "요청 종료",
+            "boxType": "end",
+            "description": "한 번의 게시판 요청을 종료합니다.",
+            "prompt": "화면에 결과가 반영되면 현재 요청을 종료한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "화면 반영 결과",
+            "outputs": "종료",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "중복 저장이나 추가 요청 없이 종료됨",
+            "executionNote": ""
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "relation-board-start-action",
+          "source": "box-board-start",
+          "target": "box-identify-action",
+          "type": "default",
+          "label": "요청 분류",
+          "data": {
+            "label": "요청 분류",
+            "relationType": "flow",
+            "description": "들어온 요청의 종류를 확인합니다.",
+            "prompt": "요청 정보를 빠뜨리지 않고 분류한다.",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-action-list",
+          "source": "box-identify-action",
+          "target": "box-post-list-flow",
+          "type": "default",
+          "label": "목록",
+          "data": {
+            "label": "목록",
+            "relationType": "flow",
+            "description": "목록 요청이면 게시글 목록 Flow로 이동합니다.",
+            "prompt": "list 요청일 때만 이동한다.",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-action-read",
+          "source": "box-identify-action",
+          "target": "box-post-read-flow",
+          "type": "default",
+          "label": "읽기",
+          "data": {
+            "label": "읽기",
+            "relationType": "flow",
+            "description": "상세 요청이면 게시글 읽기 Flow로 이동합니다.",
+            "prompt": "read 요청일 때 게시글 ID를 함께 전달한다.",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-action-editor",
+          "source": "box-identify-action",
+          "target": "box-post-editor-flow",
+          "type": "default",
+          "label": "작성 또는 수정",
+          "data": {
+            "label": "작성 또는 수정",
+            "relationType": "flow",
+            "description": "작성 또는 수정 요청을 편집 Flow로 전달합니다.",
+            "prompt": "create 또는 update 요청과 현재 사용자 정보를 전달한다.",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-action-comment",
+          "source": "box-identify-action",
+          "target": "box-comment-flow",
+          "type": "default",
+          "label": "댓글 또는 대댓글",
+          "data": {
+            "label": "댓글 또는 대댓글",
+            "relationType": "flow",
+            "description": "댓글 관련 요청을 댓글 Flow로 전달합니다.",
+            "prompt": "comment 또는 reply 요청과 부모 댓글 ID를 전달한다.",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-list-result",
+          "source": "box-post-list-flow",
+          "target": "box-board-result",
+          "type": "default",
+          "label": "목록 결과",
+          "data": {
+            "label": "목록 결과",
+            "relationType": "flow",
+            "description": "목록 조회 결과를 화면 전달 Box로 보냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-read-result",
+          "source": "box-post-read-flow",
+          "target": "box-board-result",
+          "type": "default",
+          "label": "상세 결과",
+          "data": {
+            "label": "상세 결과",
+            "relationType": "flow",
+            "description": "상세 조회 결과를 화면 전달 Box로 보냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-editor-result",
+          "source": "box-post-editor-flow",
+          "target": "box-board-result",
+          "type": "default",
+          "label": "저장 결과",
+          "data": {
+            "label": "저장 결과",
+            "relationType": "flow",
+            "description": "작성 또는 수정 결과를 화면 전달 Box로 보냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-comment-result",
+          "source": "box-comment-flow",
+          "target": "box-board-result",
+          "type": "default",
+          "label": "댓글 결과",
+          "data": {
+            "label": "댓글 결과",
+            "relationType": "flow",
+            "description": "댓글 저장 결과를 화면 전달 Box로 보냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-result-end",
+          "source": "box-board-result",
+          "target": "box-board-end",
+          "type": "default",
+          "label": "화면 반영 후 종료",
+          "data": {
+            "label": "화면 반영 후 종료",
+            "relationType": "send_end",
+            "description": "사용자에게 결과를 보여준 뒤 요청을 끝냅니다.",
+            "prompt": "오류 결과도 화면에 표시한 후 종료한다.",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        }
+      ]
+    },
+    "flow-post-list": {
+      "id": "flow-post-list",
+      "title": "게시글 목록 Flow",
+      "parentBoxId": "box-post-list-flow",
+      "viewport": { "x": 0, "y": 0, "zoom": 1 },
+      "nodes": [
+        {
+          "id": "box-list-start",
+          "type": "boxNode",
+          "position": { "x": 40, "y": 160 },
+          "data": {
+            "title": "목록 요청 받기",
+            "boxType": "start",
+            "description": "페이지와 검색어를 받습니다.",
+            "prompt": "페이지는 1 이상으로 보정하고 검색어 앞뒤 공백을 제거한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "page\nkeyword",
+            "outputs": "정리된 조회 조건",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "유효한 조회 조건 생성",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-load-post-list",
+          "type": "boxNode",
+          "position": { "x": 320, "y": 160 },
+          "data": {
+            "title": "게시글 목록 불러오기",
+            "boxType": "function",
+            "description": "최신 작성 순으로 게시글과 전체 개수를 불러옵니다.",
+            "prompt": "페이지당 10개 게시글을 최신 순으로 조회하고 각 글의 댓글 수를 포함한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "page\nkeyword\npageSize=10",
+            "outputs": "posts\ntotalCount\ntotalPages",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "최신 순 정렬\n검색 적용\n댓글 수 포함\n페이지 범위 처리",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-list-has-posts",
+          "type": "boxNode",
+          "position": { "x": 610, "y": 160 },
+          "data": {
+            "title": "게시글이 있는가?",
+            "boxType": "condition",
+            "description": "조회 결과가 비어 있는지 판단합니다.",
+            "prompt": "posts 길이가 0보다 큰지 판단한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "posts",
+            "outputs": "있음 또는 없음",
+            "conditionRule": "posts.length > 0",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "있음 또는 없음 중 하나로 분기",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-build-post-list",
+          "type": "boxNode",
+          "position": { "x": 900, "y": 70 },
+          "data": {
+            "title": "목록 화면 만들기",
+            "boxType": "function",
+            "description": "게시글 제목, 작성자, 작성일, 댓글 수와 페이지 이동을 표시합니다.",
+            "prompt": "각 항목을 상세 읽기로 이동할 수 있게 만들고 글쓰기 진입 버튼을 제공한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "posts\ntotalPages\ncurrentPage",
+            "outputs": "게시글 목록 화면",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "글 선택 가능\n페이지 이동 가능\n글쓰기 진입 가능",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-build-empty-list",
+          "type": "boxNode",
+          "position": { "x": 900, "y": 260 },
+          "data": {
+            "title": "빈 목록 안내",
+            "boxType": "function",
+            "description": "게시글이 없다는 안내와 글쓰기 진입을 제공합니다.",
+            "prompt": "검색 결과가 없으면 검색어를 유지하고 전체 목록 복귀 방법을 제공한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "keyword",
+            "outputs": "빈 목록 화면",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "빈 상태 안내\n글쓰기 가능\n검색 초기화 가능",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-list-end",
+          "type": "boxNode",
+          "position": { "x": 1190, "y": 160 },
+          "data": {
+            "title": "목록 결과 반환",
+            "boxType": "end",
+            "description": "목록 또는 빈 상태 결과를 상위 Flow로 반환합니다.",
+            "prompt": "완성된 목록 화면 데이터를 반환한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "목록 화면 또는 빈 목록 화면",
+            "outputs": "목록 결과",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "상위 Flow가 표시할 결과를 받음",
+            "executionNote": ""
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "relation-list-start-load",
+          "source": "box-list-start",
+          "target": "box-load-post-list",
+          "type": "default",
+          "label": "목록 조회",
+          "data": {
+            "label": "목록 조회",
+            "relationType": "round_trip",
+            "description": "저장된 게시글 목록을 요청하고 결과를 받습니다.",
+            "prompt": "조회 실패 시 오류 결과를 반환한다.",
+            "repeatRule": "",
+            "responseRule": "posts, totalCount, totalPages 또는 조회 오류"
+          }
+        },
+        {
+          "id": "relation-list-load-check",
+          "source": "box-load-post-list",
+          "target": "box-list-has-posts",
+          "type": "default",
+          "label": "결과 확인",
+          "data": {
+            "label": "결과 확인",
+            "relationType": "flow",
+            "description": "조회된 목록의 존재 여부를 확인합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-list-exists",
+          "source": "box-list-has-posts",
+          "target": "box-build-post-list",
+          "type": "default",
+          "label": "있음",
+          "data": {
+            "label": "있음",
+            "relationType": "flow",
+            "description": "게시글이 있으면 목록 화면을 만듭니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-list-empty",
+          "source": "box-list-has-posts",
+          "target": "box-build-empty-list",
+          "type": "default",
+          "label": "없음",
+          "data": {
+            "label": "없음",
+            "relationType": "flow",
+            "description": "게시글이 없으면 빈 상태를 만듭니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-list-view-end",
+          "source": "box-build-post-list",
+          "target": "box-list-end",
+          "type": "default",
+          "label": "목록 반환",
+          "data": {
+            "label": "목록 반환",
+            "relationType": "send_end",
+            "description": "목록 결과를 반환하고 내부 Flow를 끝냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-list-empty-end",
+          "source": "box-build-empty-list",
+          "target": "box-list-end",
+          "type": "default",
+          "label": "빈 상태 반환",
+          "data": {
+            "label": "빈 상태 반환",
+            "relationType": "send_end",
+            "description": "빈 상태 결과를 반환하고 내부 Flow를 끝냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        }
+      ]
+    },
+    "flow-post-read": {
+      "id": "flow-post-read",
+      "title": "게시글 읽기 Flow",
+      "parentBoxId": "box-post-read-flow",
+      "viewport": { "x": 0, "y": 0, "zoom": 1 },
+      "nodes": [
+        {
+          "id": "box-read-start",
+          "type": "boxNode",
+          "position": { "x": 40, "y": 160 },
+          "data": {
+            "title": "게시글 ID 받기",
+            "boxType": "start",
+            "description": "읽을 게시글 ID를 받습니다.",
+            "prompt": "게시글 ID가 비어 있거나 잘못된 형식이면 오류로 종료한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "postId",
+            "outputs": "검증된 postId",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "유효한 ID 또는 명확한 오류",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-load-post-detail",
+          "type": "boxNode",
+          "position": { "x": 320, "y": 160 },
+          "data": {
+            "title": "게시글과 댓글 불러오기",
+            "boxType": "function",
+            "description": "게시글 한 건과 연결된 댓글을 불러옵니다.",
+            "prompt": "게시글 작성자 정보와 댓글 작성자 정보를 포함하고 댓글은 작성 순으로 조회한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "postId",
+            "outputs": "post\ncomments",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "게시글과 모든 댓글 조회\n삭제된 데이터 제외",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-post-exists",
+          "type": "boxNode",
+          "position": { "x": 610, "y": 160 },
+          "data": {
+            "title": "게시글이 존재하는가?",
+            "boxType": "condition",
+            "description": "게시글 조회 성공 여부를 판단합니다.",
+            "prompt": "post가 존재하는지 확인한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "post",
+            "outputs": "존재 또는 없음",
+            "conditionRule": "post != null",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "존재 또는 없음으로 분기",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-build-comment-tree",
+          "type": "boxNode",
+          "position": { "x": 900, "y": 70 },
+          "data": {
+            "title": "댓글 트리 구성",
+            "boxType": "function",
+            "description": "일반 댓글 아래에 대댓글을 한 단계로 묶습니다.",
+            "prompt": "parentCommentId가 없는 댓글은 최상위, 있는 댓글은 해당 부모 아래에 배치한다. 대댓글 아래에는 추가 대댓글을 만들지 않는다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "comments",
+            "outputs": "commentTree",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "댓글 작성 순 유지\n대댓글 한 단계 표시\n부모 없는 대댓글 안전 처리",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-build-post-detail",
+          "type": "boxNode",
+          "position": { "x": 1190, "y": 70 },
+          "data": {
+            "title": "상세 화면 만들기",
+            "boxType": "function",
+            "description": "게시글 내용과 댓글 트리, 작성자용 수정 진입을 표시합니다.",
+            "prompt": "현재 사용자가 작성자이면 수정 버튼을 표시하고 모든 사용자에게 댓글 입력을 제공한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "post\ncommentTree\ncurrentUser",
+            "outputs": "게시글 상세 화면",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "본문 표시\n댓글·대댓글 표시\n작성자만 수정 진입",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-post-not-found",
+          "type": "boxNode",
+          "position": { "x": 900, "y": 270 },
+          "data": {
+            "title": "없는 게시글 안내",
+            "boxType": "function",
+            "description": "존재하지 않는 글이라는 안내와 목록 이동을 제공합니다.",
+            "prompt": "404 상태와 목록으로 돌아갈 수 있는 결과를 만든다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "postId",
+            "outputs": "없는 글 안내",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "명확한 안내\n목록 복귀 가능",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-read-end",
+          "type": "boxNode",
+          "position": { "x": 1480, "y": 160 },
+          "data": {
+            "title": "상세 결과 반환",
+            "boxType": "end",
+            "description": "상세 화면 또는 없는 글 안내를 반환합니다.",
+            "prompt": "결과를 상위 Flow로 반환한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "상세 화면 또는 오류 안내",
+            "outputs": "상세 결과",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "상위 Flow가 표시할 결과를 받음",
+            "executionNote": ""
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "relation-read-start-load",
+          "source": "box-read-start",
+          "target": "box-load-post-detail",
+          "type": "default",
+          "label": "상세 조회",
+          "data": {
+            "label": "상세 조회",
+            "relationType": "round_trip",
+            "description": "게시글과 댓글을 요청하고 결과를 받습니다.",
+            "prompt": "게시글과 댓글 조회를 하나의 상세 결과로 반환한다.",
+            "repeatRule": "",
+            "responseRule": "post와 comments 또는 없음 결과"
+          }
+        },
+        {
+          "id": "relation-read-load-exists",
+          "source": "box-load-post-detail",
+          "target": "box-post-exists",
+          "type": "default",
+          "label": "존재 확인",
+          "data": {
+            "label": "존재 확인",
+            "relationType": "flow",
+            "description": "게시글 존재 여부를 확인합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-read-exists-comments",
+          "source": "box-post-exists",
+          "target": "box-build-comment-tree",
+          "type": "default",
+          "label": "존재",
+          "data": {
+            "label": "존재",
+            "relationType": "flow",
+            "description": "게시글이 있으면 댓글 트리를 구성합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-read-missing",
+          "source": "box-post-exists",
+          "target": "box-post-not-found",
+          "type": "default",
+          "label": "없음",
+          "data": {
+            "label": "없음",
+            "relationType": "flow",
+            "description": "게시글이 없으면 안내 결과를 만듭니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-comments-detail",
+          "source": "box-build-comment-tree",
+          "target": "box-build-post-detail",
+          "type": "default",
+          "label": "댓글 포함",
+          "data": {
+            "label": "댓글 포함",
+            "relationType": "flow",
+            "description": "댓글 트리를 게시글 상세에 포함합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-detail-end",
+          "source": "box-build-post-detail",
+          "target": "box-read-end",
+          "type": "default",
+          "label": "상세 반환",
+          "data": {
+            "label": "상세 반환",
+            "relationType": "send_end",
+            "description": "상세 결과를 반환하고 끝냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-not-found-end",
+          "source": "box-post-not-found",
+          "target": "box-read-end",
+          "type": "default",
+          "label": "안내 반환",
+          "data": {
+            "label": "안내 반환",
+            "relationType": "send_end",
+            "description": "없는 글 안내를 반환하고 끝냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        }
+      ]
+    },
+    "flow-post-editor": {
+      "id": "flow-post-editor",
+      "title": "게시글 작성·수정 Flow",
+      "parentBoxId": "box-post-editor-flow",
+      "viewport": { "x": 0, "y": 0, "zoom": 0.85 },
+      "nodes": [
+        {
+          "id": "box-editor-start",
+          "type": "boxNode",
+          "position": { "x": 40, "y": 210 },
+          "data": {
+            "title": "편집 요청 받기",
+            "boxType": "start",
+            "description": "작성 또는 수정 요청과 입력값을 받습니다.",
+            "prompt": "현재 사용자와 요청 종류, 게시글 입력을 받는다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "mode\npostId 선택값\ntitle\ncontent\ncurrentUser",
+            "outputs": "편집 요청",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "작성 또는 수정 요청 식별",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-editor-mode",
+          "type": "boxNode",
+          "position": { "x": 310, "y": 210 },
+          "data": {
+            "title": "작성인가 수정인가?",
+            "boxType": "condition",
+            "description": "새 글 작성과 기존 글 수정을 구분합니다.",
+            "prompt": "mode가 create인지 update인지 판단한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "mode",
+            "outputs": "작성 또는 수정",
+            "conditionRule": "mode === create 또는 mode === update",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "작성 또는 수정으로 분기",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-load-edit-post",
+          "type": "boxNode",
+          "position": { "x": 590, "y": 340 },
+          "data": {
+            "title": "수정할 글 불러오기",
+            "boxType": "function",
+            "description": "수정 대상 게시글을 불러옵니다.",
+            "prompt": "postId로 게시글을 조회하고 작성자 ID를 포함한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "postId",
+            "outputs": "기존 게시글",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "기존 글 또는 없음 결과",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-can-edit",
+          "type": "boxNode",
+          "position": { "x": 870, "y": 340 },
+          "data": {
+            "title": "수정 권한이 있는가?",
+            "boxType": "condition",
+            "description": "현재 사용자가 게시글 작성자인지 판단합니다.",
+            "prompt": "게시글이 존재하고 post.authorId와 currentUser.id가 같은지 확인한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "기존 게시글\ncurrentUser",
+            "outputs": "수정 가능 또는 거부",
+            "conditionRule": "post != null && post.authorId === currentUser.id",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "작성자만 수정 가능",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-validate-post-input",
+          "type": "boxNode",
+          "position": { "x": 870, "y": 90 },
+          "data": {
+            "title": "게시글 입력 검증",
+            "boxType": "condition",
+            "description": "제목과 내용이 저장 가능한지 판단합니다.",
+            "prompt": "앞뒤 공백 제거 후 제목과 내용의 길이를 검증한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "title\ncontent",
+            "outputs": "유효 또는 오류 목록",
+            "conditionRule": "제목 1~100자, 내용 1~10000자",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "필수값과 길이 검증\n오류 메시지 생성",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-save-post",
+          "type": "boxNode",
+          "position": { "x": 1160, "y": 150 },
+          "data": {
+            "title": "게시글 저장",
+            "boxType": "function",
+            "description": "새 게시글을 만들거나 기존 게시글을 수정합니다.",
+            "prompt": "작성 시 작성자와 생성 시각을 기록하고 수정 시 본문과 수정 시각만 변경한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "mode\n검증된 title\n검증된 content\ncurrentUser\n기존 게시글 선택값",
+            "outputs": "저장된 게시글",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "작성 저장\n수정 저장\n작성자 유지\n수정 시각 기록",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-editor-error",
+          "type": "boxNode",
+          "position": { "x": 1160, "y": 390 },
+          "data": {
+            "title": "편집 오류 전달",
+            "boxType": "relay",
+            "description": "입력 오류, 없는 글, 권한 오류를 사용자에게 전달합니다.",
+            "prompt": "오류 종류별로 사용자가 수정할 수 있는 메시지를 만든다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "오류 종류\n오류 상세",
+            "outputs": "편집 오류 화면",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "잘못된 저장 없음\n명확한 오류 표시",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-editor-end",
+          "type": "boxNode",
+          "position": { "x": 1450, "y": 210 },
+          "data": {
+            "title": "편집 결과 반환",
+            "boxType": "end",
+            "description": "저장된 게시글 또는 오류를 상위 Flow로 반환합니다.",
+            "prompt": "성공 시 저장된 게시글 ID로 상세 화면 이동 정보를 반환한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "저장된 게시글 또는 오류",
+            "outputs": "편집 결과",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "성공 시 상세 이동\n실패 시 입력 유지",
+            "executionNote": ""
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "relation-editor-start-mode",
+          "source": "box-editor-start",
+          "target": "box-editor-mode",
+          "type": "default",
+          "label": "요청 구분",
+          "data": {
+            "label": "요청 구분",
+            "relationType": "flow",
+            "description": "작성과 수정 요청을 구분합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-editor-create-validate",
+          "source": "box-editor-mode",
+          "target": "box-validate-post-input",
+          "type": "default",
+          "label": "작성",
+          "data": {
+            "label": "작성",
+            "relationType": "flow",
+            "description": "작성 요청은 바로 입력을 검증합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-editor-update-load",
+          "source": "box-editor-mode",
+          "target": "box-load-edit-post",
+          "type": "default",
+          "label": "수정",
+          "data": {
+            "label": "수정",
+            "relationType": "round_trip",
+            "description": "수정할 게시글을 불러옵니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": "기존 게시글 또는 없음"
+          }
+        },
+        {
+          "id": "relation-editor-load-auth",
+          "source": "box-load-edit-post",
+          "target": "box-can-edit",
+          "type": "default",
+          "label": "권한 확인",
+          "data": {
+            "label": "권한 확인",
+            "relationType": "flow",
+            "description": "불러온 글의 작성자를 확인합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-editor-auth-valid",
+          "source": "box-can-edit",
+          "target": "box-validate-post-input",
+          "type": "default",
+          "label": "수정 가능",
+          "data": {
+            "label": "수정 가능",
+            "relationType": "flow",
+            "description": "권한이 있으면 입력을 검증합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-editor-auth-denied",
+          "source": "box-can-edit",
+          "target": "box-editor-error",
+          "type": "default",
+          "label": "없음 또는 권한 거부",
+          "data": {
+            "label": "없음 또는 권한 거부",
+            "relationType": "flow",
+            "description": "글이 없거나 작성자가 아니면 오류를 전달합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-editor-valid-save",
+          "source": "box-validate-post-input",
+          "target": "box-save-post",
+          "type": "default",
+          "label": "유효",
+          "data": {
+            "label": "유효",
+            "relationType": "round_trip",
+            "description": "유효한 게시글을 저장하고 결과를 받습니다.",
+            "prompt": "저장 실패 시 오류 정보를 반환한다.",
+            "repeatRule": "",
+            "responseRule": "저장된 게시글 또는 저장 오류"
+          }
+        },
+        {
+          "id": "relation-editor-invalid",
+          "source": "box-validate-post-input",
+          "target": "box-editor-error",
+          "type": "default",
+          "label": "입력 오류",
+          "data": {
+            "label": "입력 오류",
+            "relationType": "flow",
+            "description": "입력이 잘못되면 저장하지 않고 오류를 전달합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-editor-save-end",
+          "source": "box-save-post",
+          "target": "box-editor-end",
+          "type": "default",
+          "label": "저장 성공",
+          "data": {
+            "label": "저장 성공",
+            "relationType": "send_end",
+            "description": "저장된 게시글을 반환하고 끝냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-editor-error-end",
+          "source": "box-editor-error",
+          "target": "box-editor-end",
+          "type": "default",
+          "label": "오류 반환",
+          "data": {
+            "label": "오류 반환",
+            "relationType": "send_end",
+            "description": "오류를 반환하고 끝냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        }
+      ]
+    },
+    "flow-comment-editor": {
+      "id": "flow-comment-editor",
+      "title": "댓글·대댓글 Flow",
+      "parentBoxId": "box-comment-flow",
+      "viewport": { "x": 0, "y": 0, "zoom": 0.9 },
+      "nodes": [
+        {
+          "id": "box-comment-start",
+          "type": "boxNode",
+          "position": { "x": 40, "y": 210 },
+          "data": {
+            "title": "댓글 요청 받기",
+            "boxType": "start",
+            "description": "댓글 또는 대댓글 작성 요청을 받습니다.",
+            "prompt": "게시글 ID, 댓글 내용, 부모 댓글 ID 선택값, 현재 사용자를 받는다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "postId\ncontent\nparentCommentId 선택값\ncurrentUser",
+            "outputs": "댓글 작성 요청",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "댓글 작성에 필요한 입력 수신",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-comment-input-valid",
+          "type": "boxNode",
+          "position": { "x": 310, "y": 210 },
+          "data": {
+            "title": "댓글 입력이 유효한가?",
+            "boxType": "condition",
+            "description": "댓글 내용과 사용자 정보를 검증합니다.",
+            "prompt": "공백 제거 후 댓글 내용을 검증하고 로그인 사용자인지 확인한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "content\ncurrentUser",
+            "outputs": "유효 또는 오류",
+            "conditionRule": "로그인 사용자 && 내용 1~1000자",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "빈 내용 거부\n길이 제한\n로그인 확인",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-comment-kind",
+          "type": "boxNode",
+          "position": { "x": 590, "y": 120 },
+          "data": {
+            "title": "댓글인가 대댓글인가?",
+            "boxType": "condition",
+            "description": "부모 댓글 ID 존재 여부로 댓글 종류를 구분합니다.",
+            "prompt": "parentCommentId가 없으면 일반 댓글, 있으면 대댓글로 판단한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "parentCommentId",
+            "outputs": "댓글 또는 대댓글",
+            "conditionRule": "parentCommentId == null 이면 댓글, 아니면 대댓글",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "댓글 종류가 하나로 결정됨",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-load-parent-comment",
+          "type": "boxNode",
+          "position": { "x": 860, "y": 260 },
+          "data": {
+            "title": "부모 댓글 확인",
+            "boxType": "function",
+            "description": "대댓글이 연결될 부모 댓글을 불러옵니다.",
+            "prompt": "부모 댓글이 같은 게시글에 속하며 최상위 댓글인지 확인할 데이터를 반환한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "postId\nparentCommentId",
+            "outputs": "parentComment",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "부모 댓글 존재 여부와 깊이 확인",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-parent-valid",
+          "type": "boxNode",
+          "position": { "x": 1130, "y": 260 },
+          "data": {
+            "title": "대댓글을 달 수 있는가?",
+            "boxType": "condition",
+            "description": "부모가 같은 게시글의 최상위 댓글인지 판단합니다.",
+            "prompt": "대댓글에 다시 대댓글을 달지 못하도록 부모의 parentCommentId가 null인지 확인한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "parentComment\npostId",
+            "outputs": "가능 또는 거부",
+            "conditionRule": "parentComment != null && parentComment.postId === postId && parentComment.parentCommentId == null",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "대댓글 깊이 1단계 제한\n다른 게시글 부모 거부",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-save-comment",
+          "type": "boxNode",
+          "position": { "x": 1400, "y": 120 },
+          "data": {
+            "title": "댓글 저장",
+            "boxType": "function",
+            "description": "일반 댓글 또는 대댓글을 저장합니다.",
+            "prompt": "작성자, 게시글 ID, 내용, 부모 댓글 ID 선택값, 작성 시각을 저장한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "postId\ncontent\ncurrentUser\nparentCommentId 선택값",
+            "outputs": "저장된 댓글",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "댓글 저장\n대댓글 부모 연결\n작성 시각 기록",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-refresh-comments",
+          "type": "boxNode",
+          "position": { "x": 1670, "y": 120 },
+          "data": {
+            "title": "댓글 목록 갱신",
+            "boxType": "relay",
+            "description": "저장된 댓글을 상세 화면의 댓글 트리에 반영합니다.",
+            "prompt": "전체 페이지를 새로 고치지 않고 갱신된 댓글 트리를 전달한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "저장된 댓글\n기존 댓글 트리",
+            "outputs": "갱신된 댓글 트리",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "새 댓글 즉시 표시\n대댓글은 부모 아래 표시",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-comment-error",
+          "type": "boxNode",
+          "position": { "x": 1400, "y": 360 },
+          "data": {
+            "title": "댓글 오류 전달",
+            "boxType": "relay",
+            "description": "입력 오류나 잘못된 부모 댓글 오류를 전달합니다.",
+            "prompt": "사용자가 내용을 잃지 않고 수정할 수 있도록 오류를 전달한다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "오류 종류\n기존 입력",
+            "outputs": "댓글 오류 화면",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "저장 없음\n입력 유지\n명확한 안내",
+            "executionNote": ""
+          }
+        },
+        {
+          "id": "box-comment-end",
+          "type": "boxNode",
+          "position": { "x": 1940, "y": 210 },
+          "data": {
+            "title": "댓글 결과 반환",
+            "boxType": "end",
+            "description": "갱신된 댓글 트리 또는 오류를 상위 Flow로 반환합니다.",
+            "prompt": "댓글 작성 결과를 반환하고 내부 Flow를 끝낸다.",
+            "childFlowId": null,
+            "status": "approved",
+            "inputs": "댓글 트리 또는 오류",
+            "outputs": "댓글 처리 결과",
+            "conditionRule": "",
+            "repeatRule": "",
+            "scheduleRule": "",
+            "acceptanceCriteria": "상위 Flow가 결과를 받음",
+            "executionNote": ""
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "relation-comment-start-valid",
+          "source": "box-comment-start",
+          "target": "box-comment-input-valid",
+          "type": "default",
+          "label": "입력 검증",
+          "data": {
+            "label": "입력 검증",
+            "relationType": "flow",
+            "description": "댓글 입력을 먼저 검증합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-comment-valid-kind",
+          "source": "box-comment-input-valid",
+          "target": "box-comment-kind",
+          "type": "default",
+          "label": "유효",
+          "data": {
+            "label": "유효",
+            "relationType": "flow",
+            "description": "유효한 입력이면 댓글 종류를 구분합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-comment-invalid-error",
+          "source": "box-comment-input-valid",
+          "target": "box-comment-error",
+          "type": "default",
+          "label": "입력 오류",
+          "data": {
+            "label": "입력 오류",
+            "relationType": "flow",
+            "description": "입력이 잘못되면 오류를 전달합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-comment-root-save",
+          "source": "box-comment-kind",
+          "target": "box-save-comment",
+          "type": "default",
+          "label": "일반 댓글",
+          "data": {
+            "label": "일반 댓글",
+            "relationType": "round_trip",
+            "description": "부모 없이 일반 댓글을 저장합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": "저장된 최상위 댓글 또는 저장 오류"
+          }
+        },
+        {
+          "id": "relation-comment-reply-load",
+          "source": "box-comment-kind",
+          "target": "box-load-parent-comment",
+          "type": "default",
+          "label": "대댓글",
+          "data": {
+            "label": "대댓글",
+            "relationType": "round_trip",
+            "description": "대댓글이면 부모 댓글을 불러옵니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": "부모 댓글 또는 없음"
+          }
+        },
+        {
+          "id": "relation-comment-parent-check",
+          "source": "box-load-parent-comment",
+          "target": "box-parent-valid",
+          "type": "default",
+          "label": "부모 검증",
+          "data": {
+            "label": "부모 검증",
+            "relationType": "flow",
+            "description": "부모 댓글이 대댓글을 받을 수 있는지 확인합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-comment-parent-valid-save",
+          "source": "box-parent-valid",
+          "target": "box-save-comment",
+          "type": "default",
+          "label": "가능",
+          "data": {
+            "label": "가능",
+            "relationType": "round_trip",
+            "description": "유효한 부모 아래에 대댓글을 저장합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": "저장된 대댓글 또는 저장 오류"
+          }
+        },
+        {
+          "id": "relation-comment-parent-invalid",
+          "source": "box-parent-valid",
+          "target": "box-comment-error",
+          "type": "default",
+          "label": "부모 오류",
+          "data": {
+            "label": "부모 오류",
+            "relationType": "flow",
+            "description": "부모가 없거나 대댓글이면 오류를 전달합니다.",
+            "prompt": "대댓글의 대댓글은 허용하지 않는다.",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-comment-save-refresh",
+          "source": "box-save-comment",
+          "target": "box-refresh-comments",
+          "type": "default",
+          "label": "저장 결과 반영",
+          "data": {
+            "label": "저장 결과 반영",
+            "relationType": "flow",
+            "description": "저장된 댓글을 화면 댓글 트리에 반영합니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-comment-refresh-end",
+          "source": "box-refresh-comments",
+          "target": "box-comment-end",
+          "type": "default",
+          "label": "갱신 결과 반환",
+          "data": {
+            "label": "갱신 결과 반환",
+            "relationType": "send_end",
+            "description": "갱신된 댓글 트리를 반환하고 끝냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        },
+        {
+          "id": "relation-comment-error-end",
+          "source": "box-comment-error",
+          "target": "box-comment-end",
+          "type": "default",
+          "label": "오류 반환",
+          "data": {
+            "label": "오류 반환",
+            "relationType": "send_end",
+            "description": "오류를 반환하고 끝냅니다.",
+            "prompt": "",
+            "repeatRule": "",
+            "responseRule": ""
+          }
+        }
+      ]
+    }
+  },
+  "updatedAt": "2026-06-12T08:30:00.000Z"
+}

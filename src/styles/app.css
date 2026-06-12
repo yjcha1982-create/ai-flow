@@ -56,8 +56,15 @@ button { color: inherit; }
 .explorer-heading { padding: 0 7px; }
 .explorer-heading h1 { overflow: hidden; margin: 0; font-size: 20px; letter-spacing: -.04em; text-overflow: ellipsis; white-space: nowrap; }
 .explorer-heading p:last-child { margin: 8px 0 22px; color: var(--muted); font-size: 11px; line-height: 1.5; }
-.explorer-section-title { display: flex; justify-content: space-between; padding: 0 7px 7px; color: #737d8f; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.explorer-section-title { display: flex; align-items: center; justify-content: space-between; padding: 0 7px 7px; color: #737d8f; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.explorer-section-title > span { display: flex; align-items: center; gap: 6px; }
 .explorer-section-title small { display: grid; min-width: 18px; height: 18px; place-items: center; border-radius: 9px; background: #edf0f5; font-size: 9px; }
+.explorer-section-title button {
+  padding: 5px 7px; color: #554bc9; border: 1px solid #d5d1fa; border-radius: 6px;
+  background: #f7f6ff; cursor: pointer; font-size: 9px; font-weight: 700;
+  letter-spacing: 0; text-transform: none;
+}
+.explorer-section-title button:hover { border-color: #aaa3f6; background: #efedff; }
 .explorer-tree { min-height: 0; flex: 1; overflow-y: auto; }
 .explorer-flow {
   width: 100%; display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 6px;
@@ -168,6 +175,13 @@ kbd { padding: 3px 6px; border: 1px solid #cfd5df; border-bottom-width: 2px; bor
   width: 100%; margin-top: 9px; padding: 9px; color: white; border: 0;
   border-radius: 7px; background: var(--accent); cursor: pointer; font-size: 10px; font-weight: 700;
 }
+.file-import-button {
+  display: block; width: 100%; margin-top: 7px; padding: 8px; color: #5147c8;
+  border: 1px solid #c9c4f6; border-radius: 7px; background: #f8f7ff;
+  cursor: pointer; font-size: 10px; font-weight: 700; text-align: center;
+}
+.file-import-button:hover { background: #efedff; }
+.file-import-button input { display: none; }
 .import-project-button:disabled { cursor: not-allowed; opacity: .4; }
 .validation-list { display: flex; flex-direction: column; gap: 8px; }
 .validation-item { display: flex; flex-direction: column; gap: 3px; padding: 9px 10px; border: 1px solid #f0d4b0; border-radius: 7px; background: #fff9ef; }
