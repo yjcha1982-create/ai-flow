@@ -1,20 +1,27 @@
-const STORAGE_KEY = 'ai-uml-prototype';
+import { normalizeProject } from './projectModel';
 
-export function saveDiagram(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+const STORAGE_KEY = 'ai-flow-project';
+const LEGACY_KEY = 'ai-uml-prototype';
+
+export function saveProject(project) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
 }
 
-export function loadDiagram() {
+export function loadProject() {
   const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
-
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
+  if (raw) {
+    try {
+      return normalizeProject(JSON.parse(raw));
+    } catch {
+      return null;
+    }
   }
+
+  const legacy = localStorage.getItem(LEGACY_KEY);
+  if (!legacy) return null;
+  return null;
 }
 
-export function clearDiagram() {
+export function clearProject() {
   localStorage.removeItem(STORAGE_KEY);
 }

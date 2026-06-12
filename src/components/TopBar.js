@@ -1,46 +1,36 @@
 import React from 'react';
 
-const nodeButtons = [
-  ['screen', '화면'],
-  ['component', '컴포넌트'],
-  ['api', 'API'],
-  ['state', '상태'],
-  ['ai_task', 'AI 명령'],
-];
-
 export default function TopBar({
-  onAddNode,
+  onAddBox,
   onSave,
   onLoad,
-  onToggleJson,
-  onCopyJson,
-  showJson,
+  onToggleWorkspace,
+  onCopyProject,
+  workspaceOpen,
 }) {
   return (
     <header className="topbar">
       <div className="topbar-brand">
-        <span className="brand-mark">U</span>
+        <span className="brand-mark">F</span>
         <div>
-          <strong>AI UML Builder</strong>
-          <small>Visual prompt architecture</small>
+          <strong>AI Flow Studio</strong>
+          <small>RULE-DRIVEN DEVELOPMENT</small>
         </div>
       </div>
 
-      <div className="topbar-actions node-actions">
-        {nodeButtons.map(([type, label]) => (
-          <button key={type} type="button" onClick={() => onAddNode(type)}>
-            <span>+</span> {label}
-          </button>
-        ))}
+      <div className="topbar-actions">
+        <button className="add-box-button" type="button" onClick={onAddBox}>
+          <span>+</span> Box 추가
+        </button>
       </div>
 
       <div className="topbar-actions utility-actions">
         <button type="button" onClick={onSave}>저장</button>
         <button type="button" onClick={onLoad}>불러오기</button>
-        <button type="button" className={showJson ? 'active' : ''} onClick={onToggleJson}>
-          JSON 보기
+        <button type="button" className={workspaceOpen ? 'active' : ''} onClick={onToggleWorkspace}>
+          AI 작업
         </button>
-        <button type="button" className="primary" onClick={onCopyJson}>JSON 복사</button>
+        <button type="button" className="primary" onClick={onCopyProject}>프로젝트 복사</button>
       </div>
     </header>
   );

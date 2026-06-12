@@ -10,97 +10,105 @@ import ReactFlow, {
   applyEdgeChanges,
   applyNodeChanges,
 } from 'react-flow-renderer';
+import {
+  BOX_STATUSES,
+  BOX_TYPES,
+  createRelation,
+} from '../utils/projectModel';
 
-const typeLabels = {
-  screen: 'SCREEN',
-  component: 'COMPONENT',
-  api: 'API',
-  state: 'STATE',
-  ai_task: 'AI TASK',
-};
-
-const DiagramNode = memo(({ data, selected }) => {
-  const prompt = data.prompt || '프롬프트를 입력하세요.';
+const BoxNode = memo(({ data, selected }) => {
+  const type = BOX_TYPES[data.boxType] || BOX_TYPES.feature;
+  const hasPrompt = Boolean(data.prompt?.trim());
+  const hasFlow = Boolean(data.childFlowId);
 
   return (
-    <div className={`diagram-node node-${data.nodeType} ${selected ? 'selected' : ''}`}>
+    <div
+      className={`box-node ${selected ? 'selected' : ''}`}
+      style={{ '--box-color': type.color }}
+    >
       <Handle type="target" position={Position.Left} />
-      <div className="node-type">{typeLabels[data.nodeType] || data.nodeType}</div>
-      <div className="node-title">{data.title || '제목 없음'}</div>
-      {data.nodeType === 'api' && data.endpoint && (
-        <div className="node-endpoint">
-          <strong>{data.method || 'GET'}</strong> {data.endpoint}
-        </div>
-      )}
-      <p className="node-prompt">{prompt}</p>
+      <div className="box-node-head">
+        <span className="box-type">{type.label}</span>
+        <span className={`box-status status-${data.status}`}>
+          {BOX_STATUSES[data.status] || data.status}
+        </span>
+      </div>
+      <div className="box-title">{data.title || '제목 없는 Box'}</div>
+      <p className="box-description">
+        {data.description || data.prompt || '설명 또는 프롬프트를 입력하세요.'}
+      </p>
+      <div className="box-capabilities">
+        <span className={hasPrompt ? 'on' : ''}>P 프롬프트</span>
+        <span className={hasFlow ? 'on' : ''}>F 하위 Flow</span>
+      </div>
       <Handle type="source" position={Position.Right} />
     </div>
   );
 });
 
 function FlowInner({
-  nodes,
-  edges,
-  setNodes,
-  setEdges,
+  flow,
+  updateNodes,
+  updateEdges,
   onInit,
-  onSelectNode,
-  onSelectEdge,
+  onSelectBox,
+  onSelectRelation,
+  onOpenChildFlow,
   onPaneClick,
+  onViewportChange,
 }) {
-  const nodeTypes = useMemo(() => ({ diagramNode: DiagramNode }), []);
-
+  const nodeTypes = useMemo(() => ({ boxNode: BoxNode }), []);
   const handleNodesChange = useCallback(
-    (changes) => setNodes((current) => applyNodeChanges(changes, current)),
-    [setNodes],
+    (changes) => updateNodes((nodes) => applyNodeChanges(changes, nodes)),
+    [updateNodes],
   );
-
   const handleEdgesChange = useCallback(
-    (changes) => setEdges((current) => applyEdgeChanges(changes, current)),
-    [setEdges],
+    (changes) => updateEdges((edges) => applyEdgeChanges(changes, edges)),
+    [updateEdges],
   );
-
   const handleConnect = useCallback(
     (connection) => {
-      const edge = {
-        ...connection,
-        id: `edge-${Date.now()}`,
-        type: 'default',
-        label: '새 관계',
-        data: {
-          label: '새 관계',
-          edgeType: 'flow',
-          description: '',
-          prompt: '',
-        },
-      };
-      setEdges((current) => addEdge(edge, current));
+      const relation = createRelation(
+        `relation-${Date.now()}`,
+        connection.source,
+        connection.target,
+        'sequence',
+        '새 관계',
+      );
+      updateEdges((edges) => addEdge({ ...connection, ...relation }, edges));
     },
-    [setEdges],
+    [updateEdges],
   );
 
   return (
     <div className="flow-canvas">
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        key={flow.id}
+        nodes={flow.nodes}
+        edges={flow.edges}
         nodeTypes={nodeTypes}
         onNodesChange={handleNodesChange}
         onEdgesChange={handleEdgesChange}
         onConnect={handleConnect}
         onInit={onInit}
-        onNodeClick={(_, node) => onSelectNode(node)}
-        onEdgeClick={(_, edge) => onSelectEdge(edge)}
+        onNodeClick={(_, node) => onSelectBox(node)}
+        onNodeDoubleClick={(_, node) => {
+          if (node.data.childFlowId) onOpenChildFlow(node.data.childFlowId);
+        }}
+        onEdgeClick={(_, edge) => onSelectRelation(edge)}
         onPaneClick={onPaneClick}
+        onMoveEnd={(_, viewport) => onViewportChange(viewport)}
+        defaultViewport={flow.viewport}
         deleteKeyCode={null}
-        fitView
+        fitView={flow.nodes.length > 0}
         minZoom={0.25}
         maxZoom={1.8}
-        defaultEdgeOptions={{ animated: false }}
       >
         <MiniMap
           className="mini-map"
-          nodeColor={(node) => `var(--${node.data?.nodeType || 'screen'})`}
+          nodeColor={(node) =>
+            BOX_TYPES[node.data?.boxType]?.color || BOX_TYPES.feature.color
+          }
         />
         <Controls />
         <Background color="#cbd5e1" gap={24} size={1} />
