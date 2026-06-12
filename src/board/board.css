@@ -1,0 +1,130 @@
+:root {
+  --board-ink: #172033;
+  --board-muted: #6e7788;
+  --board-line: #e3e7ee;
+  --board-bg: #f4f6f9;
+  --board-accent: #5b50d6;
+  --board-accent-dark: #443ab5;
+}
+
+.board-app {
+  min-height: 100vh;
+  color: var(--board-ink);
+  background:
+    radial-gradient(circle at top left, rgba(91,80,214,.08), transparent 30%),
+    var(--board-bg);
+  font-family: 'DM Sans', 'Noto Sans KR', Arial, sans-serif;
+}
+.board-app button, .board-app input, .board-app textarea { font: inherit; }
+.board-header {
+  position: sticky; z-index: 10; top: 0; display: flex; align-items: center;
+  justify-content: space-between; height: 68px; padding: 0 6vw;
+  border-bottom: 1px solid rgba(221,225,234,.9); background: rgba(255,255,255,.92);
+  backdrop-filter: blur(14px);
+}
+.board-brand { display: flex; align-items: center; gap: 10px; padding: 0; border: 0; background: transparent; cursor: pointer; text-align: left; }
+.board-brand > span { display: grid; width: 36px; height: 36px; place-items: center; color: white; border-radius: 11px; background: linear-gradient(145deg,#746ae8,#4439bb); font-weight: 700; }
+.board-brand > div { display: flex; flex-direction: column; }
+.board-brand strong { font-size: 14px; }
+.board-brand small { color: var(--board-muted); font-size: 10px; }
+.board-header nav { display: flex; align-items: center; gap: 7px; }
+.board-header nav a, .board-header nav button, .detail-toolbar button, .editor-actions button, .comment-form button {
+  padding: 8px 11px; color: var(--board-ink); border: 1px solid var(--board-line);
+  border-radius: 8px; background: white; cursor: pointer; font-size: 11px; font-weight: 600; text-decoration: none;
+}
+.board-primary { color: white !important; border-color: var(--board-accent) !important; background: var(--board-accent) !important; }
+.board-primary:hover { background: var(--board-accent-dark) !important; }
+.board-shell { width: min(1040px, 90vw); margin: 0 auto; padding: 58px 0 80px; }
+.board-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; margin-bottom: 28px; }
+.board-kicker { margin: 0 0 7px; color: var(--board-accent); font-size: 10px; font-weight: 700; letter-spacing: .16em; }
+.board-hero h1 { max-width: 650px; margin: 0; font-size: clamp(30px, 5vw, 52px); line-height: 1.08; letter-spacing: -.055em; }
+.board-hero > div > p:last-child { max-width: 650px; margin: 14px 0 0; color: var(--board-muted); font-size: 13px; line-height: 1.7; }
+.board-user-card { min-width: 210px; padding: 18px; border: 1px solid #ddd9fb; border-radius: 14px; background: rgba(255,255,255,.82); box-shadow: 0 12px 30px rgba(45,49,72,.07); }
+.board-user-card span, .board-user-card small { display: block; color: var(--board-muted); font-size: 10px; }
+.board-user-card strong { display: block; margin: 5px 0; font-size: 17px; }
+.board-panel { padding: 28px; border: 1px solid var(--board-line); border-radius: 16px; background: white; box-shadow: 0 16px 45px rgba(39,47,66,.07); }
+.board-list-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
+.board-list-head h2 { display: inline; margin: 0 8px 0 0; font-size: 20px; }
+.board-list-head > div span { color: var(--board-muted); font-size: 10px; }
+.board-search { display: flex; gap: 6px; }
+.board-search input { width: 240px; padding: 9px 11px; border: 1px solid var(--board-line); border-radius: 8px; outline: 0; font-size: 11px; }
+.board-search input:focus { border-color: var(--board-accent); box-shadow: 0 0 0 3px rgba(91,80,214,.1); }
+.board-search button { padding: 8px 10px; border: 1px solid var(--board-line); border-radius: 8px; background: white; cursor: pointer; font-size: 10px; font-weight: 700; }
+.post-list { border-top: 1px solid var(--board-line); }
+.post-row { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 24px; padding: 20px 4px; border: 0; border-bottom: 1px solid var(--board-line); background: transparent; cursor: pointer; text-align: left; }
+.post-row:hover h3 { color: var(--board-accent); }
+.post-row-main { min-width: 0; }
+.post-row h3 { overflow: hidden; margin: 0 0 7px; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.post-row p { overflow: hidden; margin: 0; color: var(--board-muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.post-row-meta { display: flex; align-items: center; gap: 13px; color: var(--board-muted); font-size: 9px; white-space: nowrap; }
+.post-row-meta strong { color: #5147c8; padding: 5px 7px; border-radius: 6px; background: #f0effd; }
+.board-empty { padding: 70px 20px; text-align: center; }
+.board-empty strong { font-size: 16px; }
+.board-empty p { color: var(--board-muted); font-size: 11px; }
+.board-empty button { padding: 9px 12px; border-radius: 8px; cursor: pointer; }
+.pagination { display: flex; justify-content: center; gap: 5px; padding-top: 22px; }
+.pagination button { width: 32px; height: 32px; border: 1px solid var(--board-line); border-radius: 8px; background: white; cursor: pointer; font-size: 10px; }
+.pagination button.active { color: white; border-color: var(--board-accent); background: var(--board-accent); }
+.detail-toolbar { display: flex; justify-content: space-between; margin-bottom: 34px; }
+.post-detail-head { padding-bottom: 26px; border-bottom: 1px solid var(--board-line); }
+.post-category { color: var(--board-accent); font: 9px 'IBM Plex Mono', monospace; letter-spacing: .13em; }
+.post-detail-head h1 { margin: 10px 0 18px; font-size: clamp(26px,4vw,40px); line-height: 1.2; letter-spacing: -.04em; }
+.post-detail-head > div { display: flex; gap: 12px; color: var(--board-muted); font-size: 10px; }
+.post-detail-head strong { color: var(--board-ink); }
+.post-content { min-height: 240px; padding: 34px 4px; font-size: 14px; line-height: 1.9; white-space: pre-wrap; }
+.comments-panel { margin-top: 20px; }
+.comments-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.comments-heading h2 { margin: 0; font-size: 19px; }
+.comments-heading span { display: grid; min-width: 20px; height: 20px; place-items: center; color: #5147c8; border-radius: 10px; background: #f0effd; font-size: 9px; font-weight: 700; }
+.comment-form { padding: 13px; border: 1px solid var(--board-line); border-radius: 10px; background: #fafbfc; }
+.comment-form textarea { width: 100%; min-height: 78px; padding: 0; border: 0; outline: 0; background: transparent; resize: vertical; font-size: 11px; line-height: 1.6; }
+.comment-form > div { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid #eceff3; color: var(--board-muted); font-size: 9px; }
+.comment-form > div > div { display: flex; gap: 5px; }
+.comment-list { margin-top: 18px; }
+.comment-thread { padding: 18px 0; border-top: 1px solid var(--board-line); }
+.comment-author { display: flex; align-items: center; gap: 9px; }
+.comment-author > span { display: grid; width: 30px; height: 30px; place-items: center; color: white; border-radius: 50%; background: #7b72e8; font-size: 10px; font-weight: 700; }
+.comment-author > div { display: flex; flex-direction: column; }
+.comment-author strong { font-size: 11px; }
+.comment-author small { color: var(--board-muted); font-size: 8px; }
+.comment-card p { margin: 11px 0 7px 39px; font-size: 11px; line-height: 1.7; white-space: pre-wrap; }
+.comment-actions { margin-left: 39px; }
+.comment-actions button { padding: 0; color: var(--board-accent); border: 0; background: transparent; cursor: pointer; font-size: 9px; font-weight: 700; }
+.reply-form { margin: 12px 0 4px 40px; }
+.reply-card { display: grid; grid-template-columns: 24px 1fr; margin: 14px 0 0 40px; padding: 14px; border-radius: 10px; background: #f7f8fb; }
+.reply-mark { color: var(--board-accent); }
+.reply-card .comment-card p { margin-left: 39px; }
+.comments-empty { padding: 35px; color: var(--board-muted); text-align: center; font-size: 10px; }
+.editor-panel { max-width: 800px; margin: 0 auto; }
+.editor-heading { margin-bottom: 26px; }
+.editor-heading h1 { margin: 0; font-size: 30px; letter-spacing: -.04em; }
+.editor-heading p:last-child { color: var(--board-muted); font-size: 11px; }
+.editor-panel form > label { display: block; margin-bottom: 18px; }
+.editor-panel label > span { display: block; margin-bottom: 7px; font-size: 11px; font-weight: 700; }
+.editor-panel input, .editor-panel textarea { width: 100%; padding: 11px 12px; border: 1px solid var(--board-line); border-radius: 9px; outline: 0; font-size: 12px; }
+.editor-panel textarea { min-height: 360px; line-height: 1.7; resize: vertical; }
+.editor-panel input:focus, .editor-panel textarea:focus { border-color: var(--board-accent); box-shadow: 0 0 0 3px rgba(91,80,214,.1); }
+.editor-panel label small { display: block; margin-top: 5px; color: var(--board-muted); font-size: 9px; text-align: right; }
+.form-error { color: #c33c58 !important; }
+.editor-message { margin-bottom: 15px; padding: 10px; color: #a52f48; border: 1px solid #efc9d2; border-radius: 8px; background: #fff6f8; font-size: 10px; }
+.editor-actions { display: flex; justify-content: flex-end; gap: 7px; }
+.board-not-found { padding: 80px 20px; text-align: center; }
+.board-not-found > span { color: var(--board-accent); font: 30px 'IBM Plex Mono', monospace; }
+.board-not-found h1 { margin: 8px 0; font-size: 25px; }
+.board-not-found p { color: var(--board-muted); font-size: 11px; }
+.board-toast { position: fixed; z-index: 30; left: 50%; bottom: 24px; transform: translateX(-50%); padding: 11px 16px; color: white; border-radius: 9px; background: #20283a; box-shadow: 0 12px 30px rgba(20,28,45,.25); font-size: 11px; }
+
+@media (max-width: 760px) {
+  .board-header { padding: 0 4vw; }
+  .board-header nav a, .board-header nav button:not(.board-primary) { display: none; }
+  .board-shell { width: 92vw; padding-top: 34px; }
+  .board-hero { align-items: stretch; flex-direction: column; }
+  .board-user-card { min-width: 0; }
+  .board-panel { padding: 20px; }
+  .board-list-head { align-items: stretch; flex-direction: column; }
+  .board-search input { min-width: 0; width: 100%; }
+  .post-row { grid-template-columns: 1fr; gap: 10px; }
+  .post-row-meta { flex-wrap: wrap; }
+  .reply-form, .reply-card { margin-left: 15px; }
+  .field-row.equal { grid-template-columns: 1fr; }
+}

@@ -36,5 +36,8 @@ npm run build
 
 - [게시글·댓글 Flow JSON](samples/board-with-comments.flow.json)
 - [게시판 개발 요청 템플릿](samples/BOARD_DEVELOPMENT_REQUEST.md)
+- [게시판 구현 결과](samples/BOARD_IMPLEMENTATION_RESULT.md)
+
+구현된 게시판은 개발 서버의 `/#/board`에서 확인할 수 있습니다.
 
 브라우저 저장 키는 `ai-flow-project`입니다.

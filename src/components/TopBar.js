@@ -25,6 +25,7 @@ export default function TopBar({
       </div>
 
       <div className="topbar-actions utility-actions">
+        <a className="topbar-link" href="/#/board">게시판 결과</a>
         <button type="button" onClick={onSave}>저장</button>
         <button type="button" onClick={onLoad}>불러오기</button>
         <button type="button" className={workspaceOpen ? 'active' : ''} onClick={onToggleWorkspace}>

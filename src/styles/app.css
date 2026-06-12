@@ -40,6 +40,12 @@ button { color: inherit; }
   padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px;
   background: white; cursor: pointer; font-size: 12px; font-weight: 600;
 }
+.topbar-link {
+  padding: 8px 10px; color: #5147c8; border: 1px solid #d5d1fa;
+  border-radius: 8px; background: #f7f6ff; font-size: 12px; font-weight: 600;
+  text-decoration: none;
+}
+.topbar-link:hover { border-color: #aaa3f6; background: #efedff; }
 .topbar-actions button:hover, .topbar-actions button.active { border-color: #aaa3f6; background: #f4f2ff; }
 .topbar-actions button span { color: var(--accent); font-size: 16px; }
 .topbar-actions .add-box-button { padding-inline: 15px; }
